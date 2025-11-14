@@ -161,9 +161,15 @@ class ChatterboxMultilingualTTS:
     def from_local(cls, ckpt_dir, device) -> 'ChatterboxMultilingualTTS':
         ckpt_dir = Path(ckpt_dir)
 
+        # Always load to CPU first for non-CUDA devices to handle CUDA-saved models
+        if device in ["cpu", "mps"]:
+            map_location = torch.device('cpu')
+        else:
+            map_location = None
+
         ve = VoiceEncoder()
         ve.load_state_dict(
-            torch.load(ckpt_dir / "ve.pt", weights_only=True)
+            torch.load(ckpt_dir / "ve.pt", map_location=map_location, weights_only=True)
         )
         ve.to(device).eval()
 
@@ -176,7 +182,7 @@ class ChatterboxMultilingualTTS:
 
         s3gen = S3Gen()
         s3gen.load_state_dict(
-            torch.load(ckpt_dir / "s3gen.pt", weights_only=True)
+            torch.load(ckpt_dir / "s3gen.pt", map_location=map_location, weights_only=True)
         )
         s3gen.to(device).eval()
 
@@ -186,17 +192,25 @@ class ChatterboxMultilingualTTS:
 
         conds = None
         if (builtin_voice := ckpt_dir / "conds.pt").exists():
-            conds = Conditionals.load(builtin_voice).to(device)
+            conds = Conditionals.load(builtin_voice, map_location=map_location).to(device)
 
         return cls(t3, s3gen, ve, tokenizer, device, conds=conds)
 
     @classmethod
     def from_pretrained(cls, device: torch.device) -> 'ChatterboxMultilingualTTS':
+        # Check if MPS is available on macOS
+        if device == "mps" and not torch.backends.mps.is_available():
+            if not torch.backends.mps.is_built():
+                print("MPS not available because the current PyTorch install was not built with MPS enabled.")
+            else:
+                print("MPS not available because the current MacOS version is not 12.3+ and/or you do not have an MPS-enabled device on this machine.")
+            device = "cpu"
+
         ckpt_dir = Path(
             snapshot_download(
                 repo_id=REPO_ID,
                 repo_type="model",
-                revision="main", 
+                revision="main",
                 allow_patterns=["ve.pt", "t3_mtl23ls_v2.safetensors", "s3gen.pt", "grapheme_mtl_merged_expanded_v1.json", "conds.pt", "Cangjie5_TC.json"],
                 token=os.getenv("HF_TOKEN"),
             )

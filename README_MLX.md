@@ -134,10 +134,10 @@ For Macs with limited RAM, you can further optimize memory usage:
 import mlx.core as mx
 
 # Set memory limit (e.g., 4GB)
-mx.metal.set_memory_limit(4 * 1024 * 1024 * 1024)
+mx.set_memory_limit(4 * 1024 * 1024 * 1024)
 
 # Disable cache to reduce memory footprint
-mx.metal.set_cache_limit(0)
+mx.set_cache_limit(0)
 
 # Now use the model as normal
 model = ChatterboxTTS.from_pretrained(device="cpu")
@@ -202,7 +202,7 @@ pip install -r requirements-mlx.txt
 2. Set a memory limit:
    ```python
    import mlx.core as mx
-   mx.metal.set_memory_limit(4 * 1024 * 1024 * 1024)  # 4GB
+   mx.set_memory_limit(4 * 1024 * 1024 * 1024)  # 4GB
    ```
 3. Process texts one at a time instead of batching
 

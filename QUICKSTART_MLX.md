@@ -134,10 +134,10 @@ ta.save("expressive.wav", wav, model.sr)
 import mlx.core as mx
 
 # Set memory limit (e.g., 4GB)
-mx.metal.set_memory_limit(4 * 1024 * 1024 * 1024)
+mx.set_memory_limit(4 * 1024 * 1024 * 1024)
 
 # Disable cache
-mx.metal.set_cache_limit(0)
+mx.set_cache_limit(0)
 
 # Now load and use the model
 from chatterbox.tts import ChatterboxTTS
@@ -195,7 +195,7 @@ pip install -r requirements-mlx.txt
 ### "Out of memory"
 ```python
 import mlx.core as mx
-mx.metal.set_memory_limit(4 * 1024 * 1024 * 1024)  # Limit to 4GB
+mx.set_memory_limit(4 * 1024 * 1024 * 1024)  # Limit to 4GB
 ```
 
 ### Slow first generation?

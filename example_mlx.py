@@ -71,8 +71,8 @@ class MLXOptimizedInference:
         # MLX automatically uses unified memory, no configuration needed
         # But we can set cache limits if needed
         try:
-            mx.metal.set_cache_limit(0)  # Disable cache to reduce memory footprint
-            mx.metal.set_memory_limit(8 * 1024 * 1024 * 1024)  # 8GB limit (adjust as needed)
+            mx.set_cache_limit(0)  # Disable cache to reduce memory footprint
+            mx.set_memory_limit(8 * 1024 * 1024 * 1024)  # 8GB limit (adjust as needed)
             print("  - Memory optimizations configured")
         except Exception as e:
             print(f"  - Warning: Could not set memory limits: {e}")
